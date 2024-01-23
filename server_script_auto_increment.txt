@@ -1,0 +1,18 @@
+
+
+if doc.customer_name:
+    # Get the maximum custom_auto_field from existing customer records
+    latest_custom_auto_field = frappe.db.sql("""
+        SELECT MAX(CAST(SUBSTRING_INDEX(custom_auto_field, '-', -1) AS UNSIGNED)) 
+        FROM `tabCustomer` 
+        WHERE custom_auto_field IS NOT NULL
+    """)[0][0] or 0
+ 
+    # If no custom_auto_field is present, set it to 'CUST-00001'
+    if latest_custom_auto_field is None:
+        next_custom_auto_field = "CUST-00001"
+    else:
+        # Increment the latest custom_auto_field value by 1 for the current document
+        next_custom_auto_field = "CUST-" + str(latest_custom_auto_field + 1).zfill(5)
+ 
+    doc.custom_auto_field = next_custom_auto_field
